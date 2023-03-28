@@ -2,7 +2,7 @@
 
 ## 🍪✂️ Project
 
-<img src="https://i.kym-cdn.com/photos/images/newsfeed/000/056/244/Mudkip_baked_in_3D_by_cezkid.gif" width=24px/>***So I Herd U Liek Wordles***<img src="https://i.kym-cdn.com/photos/images/newsfeed/000/056/244/Mudkip_baked_in_3D_by_cezkid.gif" width=24px/>
+<img src="https://i.kym-cdn.com/photos/images/newsfeed/000/056/244/Mudkip_baked_in_3D_by_cezkid.gif" width="24"/>***So I Herd U Liek Wordles***<img src="https://i.kym-cdn.com/photos/images/newsfeed/000/056/244/Mudkip_baked_in_3D_by_cezkid.gif" width="24"/>
 
 This is a recreation of Wordle, with our own flavour imparted onto it.
 
