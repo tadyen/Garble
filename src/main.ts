@@ -1,7 +1,21 @@
 import { getWordOfTheDay, getGarble, checkIsGarble, answers, allowedGuesses } from './words.js'
 
-const MAX_ROWS = 6
+const MAX_ROWS = 10
 const MAX_TILES = 5
+
+const enum LetterState{
+    INITIAL = "none",
+    MISSING = "missing",
+    PRESENT = "present",
+    CORRECT = "correct",
+}
+
+const enum LetterColour{
+    YELLOW = "#b59f3b",
+    GREEN = "#538d4e",
+    DARKGREY = "#3a3a3c",
+    GREY = "#818384",
+}
 
 var g_currentRow: number = 0
 var g_currentTile: number = 0
@@ -10,6 +24,7 @@ var g_secret: string = getGarble()
 
 function setupHTMLElements(){
     setupGameTiles()
+    setupKeyboardModule()
     return
 }
 
@@ -28,12 +43,51 @@ function checkGuessIsValid( guess: string ):boolean{
         console.log("Guess is NOT Garble - BAD")
         return false
     }
-
+    
     return true
+}
+
+function winGame(){
+    g_currentRow = MAX_ROWS + 1
+    console.log("GAME WON")
+}
+
+function loseGame(){
+    g_currentRow = MAX_ROWS + 1
+    console.log("GAME LOST")
 }
 
 function compareGuessToSecret( guess: string ):boolean{
     if( ! checkGuessIsValid(guess) ){ return false}
+    
+    for(let index in Array.from(guess) ){
+        let tile = document.getElementById(`tile_r${g_currentRow}t${index}`)
+        let keyboardKey = document.querySelector(".keyboardModule").querySelector(`#keyboardKey_${guess[index]}`) as HTMLDivElement
+        if( guess[index] == g_secret[index] ){
+            tile.dataset.state = LetterState["CORRECT"]
+            tile.style.background = LetterColour["GREEN"]
+            keyboardKey.style.backgroundColor = LetterColour["GREEN"]
+            continue
+        }
+        if( g_secret.indexOf(guess[index]) != -1 ){
+            tile.dataset.state = LetterState["PRESENT"]
+            tile.style.background = LetterColour["YELLOW"]
+            keyboardKey.style.backgroundColor = LetterColour["YELLOW"]
+            continue
+        }
+        
+        keyboardKey.style.backgroundColor = LetterColour["DARKGREY"]
+        tile.style.background = LetterColour["DARKGREY"]
+        tile.dataset.state = LetterState["MISSING"]
+    }
+
+    if( guess == g_secret ){
+        winGame()
+    }
+    else if( g_currentRow == MAX_ROWS - 1 ){
+        loseGame()
+    }
+
     return true
 }
 
@@ -45,8 +99,7 @@ function pageKeyboardEvents(){
         console.log(key)
         if(/^[a-z]$/.test(key) && g_currentTile < MAX_TILES){
             let tileElem = document.querySelector(`#tile_r${g_currentRow}t${g_currentTile}`) as HTMLDivElement
-            let pElem = tileElem.querySelector("p") as HTMLParagraphElement
-            pElem.textContent = key.toUpperCase()
+            tileElem.textContent = key.toUpperCase()
             g_guess += key
             g_currentTile++
             return null
@@ -54,8 +107,7 @@ function pageKeyboardEvents(){
         
         if( key == "Backspace" && g_currentTile > 0 ){
             let tileElem = document.querySelector(`#tile_r${g_currentRow}t${g_currentTile-1}`) as HTMLDivElement
-            let pElem = tileElem.querySelector("p") as HTMLParagraphElement
-            pElem.textContent = ""
+            tileElem.textContent = ""
             g_guess = g_guess.slice( 0, g_guess.length-1 )
             g_currentTile--
             return null
@@ -88,11 +140,38 @@ function setupGameTiles(){
             let newTile = document.createElement("div")
             newTile.classList.add("tile")
             newTile.id = `tile_r${i}t${j}`
-            let newP = document.createElement("p")
-            newTile.appendChild(newP)
+            newTile.textContent = ""
+            newTile.dataset.state = LetterState["INITIAL"]
+            newTile.style.backgroundColor = LetterColour["GREY"]
             newRow.appendChild(newTile)
         }
         board.appendChild(newRow)
+    }
+    return
+}
+
+function setupKeyboardModule(){
+    const keySet = {
+        0: [..."qwertyuiop"],
+        1: [..."asdfghjkl"],
+        2: ["enter", ..."zxcvbnm", "del"],
+    }
+    let keyboardModule = document.querySelector(".keyboardModule") as HTMLDivElement
+    for( let row in keySet ){
+        let newRowElem = document.createElement("div")
+        newRowElem.className = "keyboardRow"
+        for( let key of keySet[row] ){
+            let newKeyElem = document.createElement("div")
+            newKeyElem.className = "keyboardKey"
+            newKeyElem.id = `keyboardKey_${key}`
+            newKeyElem.textContent = key.toUpperCase()
+            newKeyElem.style.backgroundColor = LetterColour["GREY"]
+            if( ["enter","del"].indexOf(key) != -1 ){
+                newKeyElem.style.fontSize = "16px"
+            }
+            newRowElem.appendChild(newKeyElem)
+        }
+        keyboardModule.appendChild(newRowElem)
     }
     return
 }

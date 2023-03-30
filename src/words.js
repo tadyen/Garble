@@ -1,29 +1,20 @@
 // Taken from https://github.com/yyx990803/vue-wordle/blob/main/src/words.ts
 // Words list can also be found in source code in Developer tools of the Wordle website. However it is very obfuscated and there is no clear seperation between answers and allowed words.
-var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
-    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
-        if (ar || !(i in from)) {
-            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
-            ar[i] = from[i];
-        }
-    }
-    return to.concat(ar || Array.prototype.slice.call(from));
-};
 // this is a reduced version of the original function from the source code above
 export function getWordOfTheDay() {
-    var now = new Date();
-    var start = new Date(2023, 0, 0);
-    var diff = Number(now) - Number(start);
-    var day = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const now = new Date();
+    const start = new Date(2023, 0, 0);
+    const diff = Number(now) - Number(start);
+    let day = Math.floor(diff / (1000 * 60 * 60 * 24));
     return answers[day % answers.length];
 }
 export function getGarble() {
-    var garble = "";
-    var isGarble = false;
-    var is5Char = false;
+    let garble = "";
+    let isGarble = false;
+    let is5Char = false;
     while (!is5Char && !isGarble) {
         garble = "";
-        for (var i = 0; i < 5; i++) {
+        for (let i = 0; i < 5; i++) {
             // 26 chars in alphabet. 97(dec) is 'a' in ASCII
             garble += String.fromCharCode(97 + Math.floor(Math.random() * 26));
         }
@@ -33,10 +24,10 @@ export function getGarble() {
     return garble;
 }
 export function checkIsGarble(word) {
-    return (__spreadArray(__spreadArray([], answers, true), allowedGuesses, true).indexOf(word) == -1);
+    return ([...answers, ...allowedGuesses].indexOf(word) == -1);
 }
 // copied from Wordle source
-export var answers = [
+export const answers = [
     'cigar',
     'rebut',
     'sissy',
@@ -2353,7 +2344,7 @@ export var answers = [
     'rural',
     'shave'
 ];
-export var allowedGuesses = [
+export const allowedGuesses = [
     'aahed',
     'aalii',
     'aargh',
