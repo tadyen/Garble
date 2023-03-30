@@ -1,24 +1,97 @@
-.tile{
-    width: 48px;
-    height: 48px; 
-    background-color: grey;
+html{
+    font-family: 'Montserrat Alternates', sans-serif;
+    background-color: rgb(31, 25, 25);
+    font-size: 1.2rem;
     color: white;
-    border: solid 1px black;
-    display: inline-block;
+}
+body{
+    margin: 0 auto;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+header{
+    margin: 4vh auto;
     text-align: center;
-    font-size: 36px;
+}
+main{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin: 0 auto;
+}
+.gameBoard{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: auto;
 }
 .row{
-    border: dotted 1px green;
+    width: 100%;
+    display: grid;
+    grid-gap: 5px;
+    margin: 2.5px auto;
+    grid-template-columns: repeat(5, 48px);
+    grid-template-rows: 48px;
+}
+.tile{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation-iteration-count: 1;
 }
 
-.keyboardKey{
-    width: 48px;
-    height: 48px; 
-    background-color: lightgrey;
-    color: white;
-    border: solid 1px black;
+.keyboardModule{
     display: inline-block;
+    margin: 4vh auto;
+    width: 50ch;
+}
+.keyboardRow{
+    display: flex;
+    justify-content: center;
+}
+.keyboardKey{
+    flex-basis: 48px;
+    height: 48px;
+    border-radius: 5px;
+    margin: 2px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#delKey{
+    flex-basis: 64px;
+}
+#enterKey{
+    flex-basis: 64px;
+}
+
+footer{
+    margin: auto;
+    display: flex;
+    justify-items: center;
+    bottom: 0px;
+    width: 100%;
+}
+footer p{
+    margin: 0 auto;
     text-align: center;
-    font-size: 24px;
+    padding: 0.5rem 0px;
+}
+
+/* animations */
+@keyframes flip {
+    0% {
+        transform: rotateX(0);
+    }
+    45% {
+        transform: rotateX(90deg);
+    }
+    55% {
+        transform: rotateX(90deg);
+    }
+    100% {
+        transform: rotateX(0);
+    }
 }

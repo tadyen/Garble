@@ -48,12 +48,10 @@ function checkGuessIsValid( guess: string ):boolean{
 }
 
 function winGame(){
-    g_currentRow = MAX_ROWS + 1
     console.log("GAME WON")
 }
 
 function loseGame(){
-    g_currentRow = MAX_ROWS + 1
     console.log("GAME LOST")
 }
 
@@ -63,29 +61,48 @@ function compareGuessToSecret( guess: string ):boolean{
     for(let index in Array.from(guess) ){
         let tile = document.getElementById(`tile_r${g_currentRow}t${index}`)
         let keyboardKey = document.querySelector(".keyboardModule").querySelector(`#keyboardKey_${guess[index]}`) as HTMLDivElement
+        let timeout = Number(index) * 0.4 * 1000
+
+        /* @keyframes duration | easing-function | delay | name */
+        // tile.style.animation = `0.5s ease forwards ${Number(index) * 0.4}s flip`
+        
         if( guess[index] == g_secret[index] ){
-            tile.dataset.state = LetterState["CORRECT"]
-            tile.style.background = LetterColour["GREEN"]
-            keyboardKey.style.backgroundColor = LetterColour["GREEN"]
+            setTimeout(() => {
+                tile.dataset.state = LetterState["CORRECT"]
+                tile.style.background = LetterColour["GREEN"]
+                keyboardKey.style.backgroundColor = LetterColour["GREEN"]
+                tile.style.animation = "flip 0.5s ease forwards"
+            }, timeout)
             continue
         }
         if( g_secret.indexOf(guess[index]) != -1 ){
-            tile.dataset.state = LetterState["PRESENT"]
-            tile.style.background = LetterColour["YELLOW"]
-            keyboardKey.style.backgroundColor = LetterColour["YELLOW"]
+            setTimeout(() => {
+                tile.dataset.state = LetterState["PRESENT"]
+                tile.style.background = LetterColour["YELLOW"]
+                keyboardKey.style.backgroundColor = LetterColour["YELLOW"]
+                tile.style.animation = "flip 0.5s ease forwards"
+            }, timeout)
             continue
         }
         
-        keyboardKey.style.backgroundColor = LetterColour["DARKGREY"]
-        tile.style.background = LetterColour["DARKGREY"]
-        tile.dataset.state = LetterState["MISSING"]
+        if( true ){
+            setTimeout(() => {
+                keyboardKey.style.backgroundColor = LetterColour["DARKGREY"]
+                tile.style.background = LetterColour["DARKGREY"]
+                tile.dataset.state = LetterState["MISSING"]
+                tile.style.animation = "flip 0.5s ease forwards"
+            }, timeout)
+            continue
+        }
     }
 
     if( guess == g_secret ){
-        winGame()
+        g_currentRow = MAX_ROWS + 1 //terminate input checks
+        setTimeout(() => {winGame()}, 2400)
     }
     else if( g_currentRow == MAX_ROWS - 1 ){
-        loseGame()
+        g_currentRow = MAX_ROWS + 1 //terminate input checks
+        setTimeout(() => {loseGame()}, 2400)
     }
 
     return true
@@ -168,6 +185,7 @@ function setupKeyboardModule(){
             newKeyElem.style.backgroundColor = LetterColour["GREY"]
             if( ["enter","del"].indexOf(key) != -1 ){
                 newKeyElem.style.fontSize = "16px"
+                newKeyElem.id = `${key}Key`
             }
             newRowElem.appendChild(newKeyElem)
         }

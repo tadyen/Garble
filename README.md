@@ -2,6 +2,8 @@
 
 ## What is Garble?
 
+Live demo: [Play Garble!](https://tadyen.github.io/Garble/)
+
 ![thanos big thonk](https://cdn.drawception.com/drawings/V3X730WST0.png)
 
 Garble is [Wordle](https://www.nytimes.com/games/wordle/index.html) but instead of guessing a secret word, the player must ***use garble to guess the garble***.
@@ -15,7 +17,7 @@ So I’ve decided to go with “Garble” because it’s different enough.
 ## How to play?
 
 - The game starts off with a secret 5-character 'word'.
-- The player has 6 attempts to guess this 'word'.
+- The player has 10 attempts to guess this 'word'.
 - The guesses must also be 5-character 'words'.
 - The 'word' MUST NOT be of a known English word - it must be *garble*
 - Likewise the secret 'word' isn't actually an English word - it's *garble*

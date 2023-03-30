@@ -26,11 +26,9 @@ function checkGuessIsValid(guess) {
     return true;
 }
 function winGame() {
-    g_currentRow = MAX_ROWS + 1;
     console.log("GAME WON");
 }
 function loseGame() {
-    g_currentRow = MAX_ROWS + 1;
     console.log("GAME LOST");
 }
 function compareGuessToSecret(guess) {
@@ -40,27 +38,44 @@ function compareGuessToSecret(guess) {
     for (let index in Array.from(guess)) {
         let tile = document.getElementById(`tile_r${g_currentRow}t${index}`);
         let keyboardKey = document.querySelector(".keyboardModule").querySelector(`#keyboardKey_${guess[index]}`);
+        let timeout = Number(index) * 0.4 * 1000;
+        /* @keyframes duration | easing-function | delay | name */
+        // tile.style.animation = `0.5s ease forwards ${Number(index) * 0.4}s flip`
         if (guess[index] == g_secret[index]) {
-            tile.dataset.state = "correct" /* LetterState["CORRECT"] */;
-            tile.style.background = "#538d4e" /* LetterColour["GREEN"] */;
-            keyboardKey.style.backgroundColor = "#538d4e" /* LetterColour["GREEN"] */;
+            setTimeout(() => {
+                tile.dataset.state = "correct" /* LetterState["CORRECT"] */;
+                tile.style.background = "#538d4e" /* LetterColour["GREEN"] */;
+                keyboardKey.style.backgroundColor = "#538d4e" /* LetterColour["GREEN"] */;
+                tile.style.animation = "flip 0.5s ease forwards";
+            }, timeout);
             continue;
         }
         if (g_secret.indexOf(guess[index]) != -1) {
-            tile.dataset.state = "present" /* LetterState["PRESENT"] */;
-            tile.style.background = "#b59f3b" /* LetterColour["YELLOW"] */;
-            keyboardKey.style.backgroundColor = "#b59f3b" /* LetterColour["YELLOW"] */;
+            setTimeout(() => {
+                tile.dataset.state = "present" /* LetterState["PRESENT"] */;
+                tile.style.background = "#b59f3b" /* LetterColour["YELLOW"] */;
+                keyboardKey.style.backgroundColor = "#b59f3b" /* LetterColour["YELLOW"] */;
+                tile.style.animation = "flip 0.5s ease forwards";
+            }, timeout);
             continue;
         }
-        keyboardKey.style.backgroundColor = "#3a3a3c" /* LetterColour["DARKGREY"] */;
-        tile.style.background = "#3a3a3c" /* LetterColour["DARKGREY"] */;
-        tile.dataset.state = "missing" /* LetterState["MISSING"] */;
+        if (true) {
+            setTimeout(() => {
+                keyboardKey.style.backgroundColor = "#3a3a3c" /* LetterColour["DARKGREY"] */;
+                tile.style.background = "#3a3a3c" /* LetterColour["DARKGREY"] */;
+                tile.dataset.state = "missing" /* LetterState["MISSING"] */;
+                tile.style.animation = "flip 0.5s ease forwards";
+            }, timeout);
+            continue;
+        }
     }
     if (guess == g_secret) {
-        winGame();
+        g_currentRow = MAX_ROWS + 1; //terminate input checks
+        setTimeout(() => { winGame(); }, 2400);
     }
     else if (g_currentRow == MAX_ROWS - 1) {
-        loseGame();
+        g_currentRow = MAX_ROWS + 1; //terminate input checks
+        setTimeout(() => { loseGame(); }, 2400);
     }
     return true;
 }
@@ -140,6 +155,7 @@ function setupKeyboardModule() {
             newKeyElem.style.backgroundColor = "#818384" /* LetterColour["GREY"] */;
             if (["enter", "del"].indexOf(key) != -1) {
                 newKeyElem.style.fontSize = "16px";
+                newKeyElem.id = `${key}Key`;
             }
             newRowElem.appendChild(newKeyElem);
         }
