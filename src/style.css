@@ -80,18 +80,27 @@ footer p{
     padding: 0.5rem 0px;
 }
 
+/* .gameBoard > #row_r0{
+    box-shadow: 0px 0px 4px 2px rgb(200, 53, 0);
+}  */
+
 /* animations */
 @keyframes flip {
-    0% {
-        transform: rotateX(0);
-    }
-    45% {
-        transform: rotateX(90deg);
-    }
-    55% {
-        transform: rotateX(90deg);
-    }
-    100% {
-        transform: rotateX(0);
-    }
+    0% { transform: rotateX(0); }
+    45% { transform: rotateX(90deg); }
+    55% { transform: rotateX(90deg); }
+    100% { transform: rotateX(0); }
+}
+
+@keyframes shake{
+    0% { transform: translateX(0%) }
+    11% { transform: translateX(-5%) }
+    22% { transform: translateX(5%) }
+    33% { transform: translateX(-3%) }
+    44% { transform: translateX(3%) }
+    55% { transform: translateX(-2%) }
+    66% { transform: translateX(2%) }
+    77% { transform: translateX(-1%) }
+    88% { transform: translateX(1%) }
+    100% { transform: translateX(0%) }
 }

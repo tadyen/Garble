@@ -15,6 +15,7 @@ const enum LetterColour{
     GREEN = "#538d4e",
     DARKGREY = "#3a3a3c",
     GREY = "#818384",
+    ORANGERED = "#C43500",
 }
 
 var g_currentRow: number = 0
@@ -34,17 +35,33 @@ function setupEventListeners(){
 }
 
 function checkGuessIsValid( guess: string ):boolean{
+    let rowElem = document.getElementById(`row_r${g_currentRow}`) as HTMLDivElement
     if( guess.length != MAX_TILES ){
         console.log("Guess has incorrect length - BAD")
+        animateBadRow(rowElem);
         return false
     }
     
     if( ! checkIsGarble(guess) ){
         console.log("Guess is NOT Garble - BAD")
+        animateBadRow(rowElem);
         return false
     }
     
     return true
+}
+
+
+function animateBadRow(rowElem: HTMLDivElement){
+    let duration = 0.5
+    rowElem.style.animation = `shake ${duration}s ease forwards`
+    rowElem.style.boxShadow = `0px 0px 4px 2px ${LetterColour["ORANGERED"]}`
+    setTimeout(() => {
+        rowElem.style.animation = ""
+        rowElem.style.boxShadow = ""
+        return null
+    }, duration * 1000);
+    return
 }
 
 function winGame(){
@@ -63,9 +80,6 @@ function compareGuessToSecret( guess: string ):boolean{
         let keyboardKey = document.querySelector(".keyboardModule").querySelector(`#keyboardKey_${guess[index]}`) as HTMLDivElement
         let timeout = Number(index) * 0.4 * 1000
 
-        /* @keyframes duration | easing-function | delay | name */
-        // tile.style.animation = `0.5s ease forwards ${Number(index) * 0.4}s flip`
-        
         if( guess[index] == g_secret[index] ){
             setTimeout(() => {
                 tile.dataset.state = LetterState["CORRECT"]
@@ -151,7 +165,7 @@ function setupGameTiles(){
         // Row
         let newRow = document.createElement("div")
         newRow.classList.add("row")
-        newRow.id = `tile_r${i}`
+        newRow.id = `row_r${i}`
         for(let j=0; j<MAX_TILES; j++){
             //Tiles
             let newTile = document.createElement("div")
