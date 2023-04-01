@@ -49,7 +49,7 @@ function checkGuessIsValid(guess) {
     return true;
 }
 function popupMessage(message, duration) {
-    let msgElem = document.querySelector(".splash > .popupMsg");
+    let msgElem = document.querySelector(".popupMsg");
     msgElem.textContent = message;
     msgElem.classList.remove("hidden");
     msgElem.classList.add("visible");
@@ -136,10 +136,17 @@ function infoEvents() {
         infoSplashElem.style.display = "none";
         return null;
     }
+    function _showInfo() {
+        let infoSplashElem = document.getElementById("splashInfo");
+        infoSplashElem.style.display = "";
+        return null;
+    }
     let infoSplashElem = document.getElementById("splashInfo");
-    let buttonElem = document.getElementById("b_closePopupInfo");
+    let buttonHideElem = document.getElementById("b_closePopupInfo");
+    let buttonShowElem = document.getElementById("b_showPopupInfo");
     infoSplashElem.onclick = () => { _hideInfo(); };
-    buttonElem.onclick = () => { _hideInfo(); };
+    buttonHideElem.onclick = () => { _hideInfo(); };
+    buttonShowElem.onclick = () => { _showInfo(); };
     return;
 }
 function pageKeyboardEvents() {

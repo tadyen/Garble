@@ -74,7 +74,7 @@ function checkGuessIsValid( guess: string ):boolean{
 }
 
 function popupMessage(message: string, duration: number){
-    let msgElem = document.querySelector(".splash > .popupMsg") as HTMLDivElement
+    let msgElem = document.querySelector(".popupMsg") as HTMLDivElement
     msgElem.textContent = message
     msgElem.classList.remove("hidden")
     msgElem.classList.add("visible")
@@ -169,11 +169,19 @@ function infoEvents(){
         infoSplashElem.style.display = "none"
         return null
     }
-    let infoSplashElem = document.getElementById("splashInfo") as HTMLDivElement
-    let buttonElem = document.getElementById("b_closePopupInfo") as HTMLButtonElement
 
+    function _showInfo(){
+        let infoSplashElem = document.getElementById("splashInfo") as HTMLDivElement
+        infoSplashElem.style.display = ""
+        return null
+    }
+
+    let infoSplashElem = document.getElementById("splashInfo") as HTMLDivElement
+    let buttonHideElem = document.getElementById("b_closePopupInfo") as HTMLButtonElement
+    let buttonShowElem = document.getElementById("b_showPopupInfo") as HTMLButtonElement
     infoSplashElem.onclick = ()=>{ _hideInfo() }
-    buttonElem.onclick = ()=>{ _hideInfo() }
+    buttonHideElem.onclick = ()=>{ _hideInfo() }
+    buttonShowElem.onclick = ()=>{ _showInfo() }
     return
 }
 
