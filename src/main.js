@@ -1,6 +1,23 @@
 import { getGarble, checkIsGarble } from './words.js';
 const MAX_ROWS = 10;
 const MAX_TILES = 5;
+const gratzMsg = [
+    "Well done!",
+    "Amazing",
+    "Good job",
+    "Splendid",
+    "Magnificient",
+    ":)",
+    "Bravo!",
+    "GG",
+];
+const loserMsg = [
+    "Better luck next time...",
+    "Failure.",
+    "Git gud",
+    "Thanks for playing!",
+    "GG",
+];
 var g_currentRow = 0;
 var g_currentTile = 0;
 var g_guess = "";
@@ -12,21 +29,36 @@ function setupHTMLElements() {
 }
 function setupEventListeners() {
     pageKeyboardEvents();
+    infoEvents();
     return;
 }
 function checkGuessIsValid(guess) {
     let rowElem = document.getElementById(`row_r${g_currentRow}`);
     if (guess.length != MAX_TILES) {
+        popupMessage("Too Short!", 2);
         console.log("Guess has incorrect length - BAD");
         animateBadRow(rowElem);
         return false;
     }
     if (!checkIsGarble(guess)) {
+        popupMessage("Musn't be a word!", 2);
         console.log("Guess is NOT Garble - BAD");
         animateBadRow(rowElem);
         return false;
     }
     return true;
+}
+function popupMessage(message, duration) {
+    let msgElem = document.querySelector(".splash > .popupMsg");
+    msgElem.textContent = message;
+    msgElem.classList.remove("hidden");
+    msgElem.classList.add("visible");
+    setTimeout(() => {
+        msgElem.classList.add("hidden");
+        msgElem.classList.remove("visible");
+        return null;
+    }, duration * 1000);
+    return;
 }
 function animateBadRow(rowElem) {
     let duration = 0.5;
@@ -40,9 +72,16 @@ function animateBadRow(rowElem) {
     return;
 }
 function winGame() {
+    let msg = gratzMsg[Math.floor(Math.random() * gratzMsg.length)];
+    popupMessage(msg, 5);
     console.log("GAME WON");
 }
 function loseGame() {
+    let msg = loserMsg[Math.floor(Math.random() * gratzMsg.length)];
+    popupMessage(msg, 3);
+    setTimeout(() => {
+        popupMessage(`Secret: ${g_secret}`, 5);
+    }, 3000);
     console.log("GAME LOST");
 }
 function compareGuessToSecret(guess) {
@@ -90,6 +129,18 @@ function compareGuessToSecret(guess) {
         setTimeout(() => { loseGame(); }, 2400);
     }
     return true;
+}
+function infoEvents() {
+    function _hideInfo() {
+        let infoSplashElem = document.getElementById("splashInfo");
+        infoSplashElem.style.display = "none";
+        return null;
+    }
+    let infoSplashElem = document.getElementById("splashInfo");
+    let buttonElem = document.getElementById("b_closePopupInfo");
+    infoSplashElem.onclick = () => { _hideInfo(); };
+    buttonElem.onclick = () => { _hideInfo(); };
+    return;
 }
 function pageKeyboardEvents() {
     function _onkeyupEvent(event) {

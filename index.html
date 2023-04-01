@@ -32,6 +32,25 @@
         <footer>
             <p>by Alex "tadyen" Wong - UNLICENSE 2023</p>
         </footer>
+        <div class="splash">
+            <div class="popupMsg hidden">asdf</div>
+        </div>
+        <div class="splash focus" id="splashInfo">
+            <div class="popupInfo">
+                <button id="b_closePopupInfo">x</button>
+                <p>Placeholder instructions:</p>
+                <p>Guess the secret 5-character 'word'</p>
+                <p>You have 10 attempts at guessing it.</p>
+                <p>The 'word' MUST NOT be of a known English word - it must be Garble</p>
+                <p>The 'word' ISN'T a known English word - it is also Garble</p>
+                <p>For every guess, information is gained about the secret:</p>
+                <ul>
+                    <li>Grey: Secret does not have that character</li>
+                    <li>Yellow: Secret has that character</li>
+                    <li>Green: Secret has that character on that spot</li>
+                </ul>
+            </div>
+        </div>
         <script type="module" src="src/main.js" async defer></script>
     </body>
 </html>

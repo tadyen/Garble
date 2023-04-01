@@ -18,6 +18,25 @@ const enum LetterColour{
     ORANGERED = "#C43500",
 }
 
+const gratzMsg = [
+    "Well done!",
+    "Amazing",
+    "Good job",
+    "Splendid",
+    "Magnificient",
+    ":)",
+    "Bravo!",
+    "GG",
+]
+
+const loserMsg = [
+    "Better luck next time...",
+    "Failure.",
+    "Git gud",
+    "Thanks for playing!",
+    "GG",
+]
+
 var g_currentRow: number = 0
 var g_currentTile: number = 0
 var g_guess: string = ""
@@ -31,18 +50,21 @@ function setupHTMLElements(){
 
 function setupEventListeners(){
     pageKeyboardEvents()
+    infoEvents()
     return
 }
 
 function checkGuessIsValid( guess: string ):boolean{
     let rowElem = document.getElementById(`row_r${g_currentRow}`) as HTMLDivElement
     if( guess.length != MAX_TILES ){
+        popupMessage("Too Short!", 2)
         console.log("Guess has incorrect length - BAD")
         animateBadRow(rowElem);
         return false
     }
     
     if( ! checkIsGarble(guess) ){
+        popupMessage("Musn't be a word!", 2)
         console.log("Guess is NOT Garble - BAD")
         animateBadRow(rowElem);
         return false
@@ -51,6 +73,18 @@ function checkGuessIsValid( guess: string ):boolean{
     return true
 }
 
+function popupMessage(message: string, duration: number){
+    let msgElem = document.querySelector(".splash > .popupMsg") as HTMLDivElement
+    msgElem.textContent = message
+    msgElem.classList.remove("hidden")
+    msgElem.classList.add("visible")
+    setTimeout(() => {
+        msgElem.classList.add("hidden")
+        msgElem.classList.remove("visible")
+        return null
+    }, duration * 1000);
+    return
+}
 
 function animateBadRow(rowElem: HTMLDivElement){
     let duration = 0.5
@@ -65,10 +99,17 @@ function animateBadRow(rowElem: HTMLDivElement){
 }
 
 function winGame(){
+    let msg = gratzMsg[Math.floor(Math.random() * gratzMsg.length)]
+    popupMessage(msg, 5)
     console.log("GAME WON")
 }
 
 function loseGame(){
+    let msg = loserMsg[Math.floor(Math.random() * gratzMsg.length)]
+    popupMessage(msg, 3)
+    setTimeout(() => {
+        popupMessage(`Secret: ${g_secret}`,5)
+    }, 3000);
     console.log("GAME LOST")
 }
 
@@ -120,6 +161,20 @@ function compareGuessToSecret( guess: string ):boolean{
     }
 
     return true
+}
+
+function infoEvents(){
+    function _hideInfo(){
+        let infoSplashElem = document.getElementById("splashInfo") as HTMLDivElement
+        infoSplashElem.style.display = "none"
+        return null
+    }
+    let infoSplashElem = document.getElementById("splashInfo") as HTMLDivElement
+    let buttonElem = document.getElementById("b_closePopupInfo") as HTMLButtonElement
+
+    infoSplashElem.onclick = ()=>{ _hideInfo() }
+    buttonElem.onclick = ()=>{ _hideInfo() }
+    return
 }
 
 function pageKeyboardEvents(){
