@@ -45,18 +45,82 @@ var g_currentTile: number = 0
 var g_guess: string = ""
 var g_secret: string = getGarble()
 
-class GarbleGame{
-    GameStates = { INITIAL: "none", PLAYING:"playing", LOSE: "lose", WIN: "win" }
-    gameState: string
-    rows: number
-    tiles: number
-    row: number
-    tile: number
-    guess: string
-    secret: string
-    
+class GameBoard{
+   
     
 }
+
+class Keyboard{
+
+
+}
+
+class GamePage{
+
+
+}
+class GarbleGame{
+    GameStates = { INITIAL: "initial", PAUSE:"pause", PLAYING:"playing", LOSE: "lose", WIN: "win" } as const
+    gameState: string = this.GameStates["INITIAL"]
+    rows: number
+    columns: number
+    row: number
+    column: number
+    guess: string
+    secret: string
+
+    constructor(secret: string, rows: number, columns: number){
+        if( secret.length != columns ){
+            console.error(`Secret(${secret.length}) length does not match number of tiles ${columns}`) 
+        }
+        if( rows <= 0 ){
+            console.error(`Rows must be greater than 0`)
+        }
+        if( columns <= 0 ){
+            console.error(`Tiles must be greater than 0`)
+        }
+        this.rows = rows
+        this.columns = columns
+        return
+    }
+
+    checkIsGarble = checkIsGarble
+    getGarble = getGarble
+
+    input(key: string){
+
+    }
+
+    pause(){
+        this.gameState = this.GameStates["PAUSE"]
+        return
+    }
+
+    resume(){
+        this.gameState = this.GameStates["PLAYING"]
+        return
+    }
+
+    checkGuessIsValid( guess: string ):boolean{
+        let rowElem = document.getElementById(`row_r${g_currentRow}`) as HTMLDivElement
+        if( guess.length != MAX_TILES ){
+            popupMessage("Too Short!", 2)
+            console.log("Guess has incorrect length - BAD")
+            animateBadRow(rowElem);
+            return false
+        }
+        if( ! checkIsGarble(guess) ){
+            popupMessage("Musn't be a word!", 2)
+            console.log("Guess is NOT Garble - BAD")
+            animateBadRow(rowElem);
+            return false
+        }
+        return true
+    }
+    
+}
+
+
 
 function setupHTMLElements(){
     setupGameTiles()
