@@ -45,6 +45,19 @@ var g_currentTile: number = 0
 var g_guess: string = ""
 var g_secret: string = getGarble()
 
+class GarbleGame{
+    GameStates = { INITIAL: "none", PLAYING:"playing", LOSE: "lose", WIN: "win" }
+    gameState: string
+    rows: number
+    tiles: number
+    row: number
+    tile: number
+    guess: string
+    secret: string
+    
+    
+}
+
 function setupHTMLElements(){
     setupGameTiles()
     setupKeyboardModule()
