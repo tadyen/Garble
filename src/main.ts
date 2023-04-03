@@ -18,6 +18,9 @@ const enum LetterColour{
     ORANGERED = "#C43500",
 }
 
+const enterKey = { Enter : "enter" }
+const delKey = { Backspace : "del" }
+
 const gratzMsg = [
     "Well done!",
     "Amazing",
@@ -105,7 +108,7 @@ function winGame(){
 }
 
 function loseGame(){
-    let msg = loserMsg[Math.floor(Math.random() * gratzMsg.length)]
+    let msg = loserMsg[Math.floor(Math.random() * loserMsg.length)]
     popupMessage(msg, 3)
     setTimeout(() => {
         popupMessage(`Secret: ${g_secret}`,5)
@@ -113,53 +116,109 @@ function loseGame(){
     console.log("GAME LOST")
 }
 
+function colourFromState(state: LetterState):LetterColour{
+    switch(state){
+        case LetterState["CORRECT"]:
+            return LetterColour["GREEN"]
+        case LetterState["PRESENT"]:
+            return LetterColour["YELLOW"]
+        case LetterState["MISSING"]:
+            return LetterColour["DARKGREY"]
+        case LetterState["INITIAL"]:
+            return LetterColour["GREY"]
+        default:
+            break
+    }
+    return null
+}
+
 function compareGuessToSecret( guess: string ):boolean{
-    if( ! checkGuessIsValid(guess) ){ return false}
+    const tileDelay_s = 0.4
+
+    /** Prevent keyboard state from reverting to yellow or grey */
+    function _updateKeyboardKeyState(key: HTMLDivElement, state: LetterState){
+        let oldState = key.dataset.state
+        // prevent continuation if already of a higher state
+        switch(oldState){
+            case LetterState["CORRECT"]:
+                return
+            case LetterState["PRESENT"]:
+                if(state == LetterState["MISSING"]){ return }
+            case LetterState["MISSING"]:
+                break
+            case LetterState["INITIAL"]:
+                break
+            default:
+                break
+        }
+        // update state
+        key.dataset.state = state
+        key.style.backgroundColor = colourFromState(state)
+        return
+    }
+
+    function _updateTileState(tile: HTMLDivElement, state: LetterState){
+        let duration_s = 0.5
+        let speedUp_s = duration_s / 2
+        tile.style.animation = `flip ${duration_s}s ease forwards`
+        tile.dataset.state = state
+        setTimeout(() => {
+            tile.style.backgroundColor = colourFromState(state)
+        }, (duration_s - speedUp_s) * 1000)
+        return
+    }
     
-    for(let index in Array.from(guess) ){
-        let tile = document.getElementById(`tile_r${g_currentRow}t${index}`)
-        let keyboardKey = document.querySelector(".keyboardModule").querySelector(`#keyboardKey_${guess[index]}`) as HTMLDivElement
-        let timeout = Number(index) * 0.4 * 1000
+    function _updateStates( guess: string, delay_s: number):boolean{
+        if( ! checkGuessIsValid(guess) ){ return false }
 
-        if( guess[index] == g_secret[index] ){
-            setTimeout(() => {
-                tile.dataset.state = LetterState["CORRECT"]
-                tile.style.background = LetterColour["GREEN"]
-                keyboardKey.style.backgroundColor = LetterColour["GREEN"]
-                tile.style.animation = "flip 0.5s ease forwards"
-            }, timeout)
-            continue
+        // bugfix yellow-tiles should be grey
+        let rem: string[] = [...g_secret]
+        for( let i=0; i<MAX_TILES; i++){
+            if( guess[i] == g_secret[i] ){
+                rem[i] = ""
+            }
         }
-        if( g_secret.indexOf(guess[index]) != -1 ){
-            setTimeout(() => {
-                tile.dataset.state = LetterState["PRESENT"]
-                tile.style.background = LetterColour["YELLOW"]
-                keyboardKey.style.backgroundColor = LetterColour["YELLOW"]
-                tile.style.animation = "flip 0.5s ease forwards"
-            }, timeout)
-            continue
+
+        for(let i=0; i<MAX_TILES; i++){
+            let tile = document.getElementById(`tile_r${g_currentRow}t${i}`) as HTMLDivElement
+            let keyboardKey = document.querySelector(`#keyboardKey_${guess[i]}`) as HTMLDivElement
+            let timeout = i * delay_s * 1000
+            if( guess[i] == g_secret[i] ){
+                setTimeout(() => {
+                    _updateKeyboardKeyState(keyboardKey, LetterState["CORRECT"])
+                    _updateTileState(tile, LetterState["CORRECT"])
+                }, timeout)
+                continue
+            }
+            if( rem.includes(guess[i]) ){
+                setTimeout(() => {
+                    _updateKeyboardKeyState(keyboardKey, LetterState["PRESENT"])
+                    _updateTileState(tile, LetterState["PRESENT"])
+                }, timeout)
+                continue
+            }
+            if( true ){
+                setTimeout(() => {
+                    _updateKeyboardKeyState(keyboardKey, LetterState["MISSING"])
+                    _updateTileState(tile, LetterState["MISSING"])
+                }, timeout)
+                continue
+            }
         }
-        
-        if( true ){
-            setTimeout(() => {
-                keyboardKey.style.backgroundColor = LetterColour["DARKGREY"]
-                tile.style.background = LetterColour["DARKGREY"]
-                tile.dataset.state = LetterState["MISSING"]
-                tile.style.animation = "flip 0.5s ease forwards"
-            }, timeout)
-            continue
-        }
+        return true
     }
 
-    if( guess == g_secret ){
-        g_currentRow = MAX_ROWS + 1 //terminate input checks
-        setTimeout(() => {winGame()}, 2400)
-    }
-    else if( g_currentRow == MAX_ROWS - 1 ){
-        g_currentRow = MAX_ROWS + 1 //terminate input checks
-        setTimeout(() => {loseGame()}, 2400)
-    }
-
+    if( ! _updateStates(guess, tileDelay_s) ){ return false }
+    setTimeout(() => {
+        if( guess == g_secret ){
+            g_currentRow = MAX_ROWS + 1 //terminate input checks
+            setTimeout(() => {winGame()}, 2400)
+        }
+        else if( g_currentRow == MAX_ROWS ){
+            g_currentRow = MAX_ROWS + 1 //terminate input checks
+            setTimeout(() => {loseGame()}, 2400)
+        }
+    }, tileDelay_s * MAX_TILES);
     return true
 }
 
@@ -189,8 +248,20 @@ function pageKeyboardEvents(){
     function _onkeyupEvent(event: KeyboardEvent){
         if(g_currentRow >= MAX_ROWS){ return null }
         let key = event.key
-        if( ! /[a-z]/.test(key) && ["Enter", "Backspace"].indexOf(key) == -1 ){ return null }
-        console.log(key)
+        if( ! /^[a-z]$/.test(key) && ["Enter", "Backspace"].indexOf(key) == -1 ){ return null }
+        console.log(`key accepted: ${key}`)
+
+        //keyboardModuleKeys
+        let keyboardModuleKey: HTMLDivElement
+        if( key == "Enter" ){ keyboardModuleKey = document.querySelector(`#keyboardKey_${enterKey["Enter"]}`)}
+        if( key == "Backspace" ){ keyboardModuleKey = document.querySelector(`#keyboardKey_${delKey["Backspace"]}`)}
+        if( /^[a-z]$/.test(key) ){ keyboardModuleKey = document.querySelector(`#keyboardKey_${key}`)}
+
+        keyboardModuleKey.style.scale = "105%"
+        setTimeout(() => {
+            keyboardModuleKey.style.scale = ""
+        }, 0.1 * 1000);
+
         if(/^[a-z]$/.test(key) && g_currentTile < MAX_TILES){
             let tileElem = document.querySelector(`#tile_r${g_currentRow}t${g_currentTile}`) as HTMLDivElement
             tileElem.textContent = key.toUpperCase()
@@ -208,7 +279,7 @@ function pageKeyboardEvents(){
         }
         
         if( key == "Enter" && g_currentRow < MAX_ROWS){
-            console.log(g_guess)
+            console.log(`Guess accepted: ${g_guess}`)
             if( compareGuessToSecret( g_guess ) ){
                 g_guess = ""
                 g_currentRow++
@@ -248,8 +319,37 @@ function setupKeyboardModule(){
     const keySet = {
         0: [..."qwertyuiop"],
         1: [..."asdfghjkl"],
-        2: ["enter", ..."zxcvbnm", "del"],
+        2: [enterKey["Enter"], ..."zxcvbnm", delKey["Backspace"]],
     }
+    
+    function _inKeySet(key: string): boolean{
+        let set: string[] = [];
+        for(let index in keySet){
+            set.push( ...keySet[index])
+        }
+        if(set.includes(key)){
+            return true
+        }else{
+            return false
+        }
+    }
+
+    function _onclick(e: Event){
+        let elem = e.target as HTMLDivElement
+        let keyVal = elem.textContent.toLocaleLowerCase()
+        if( ! _inKeySet(keyVal) ){ return }
+        if( keyVal == enterKey["Enter"]){
+            document.body.dispatchEvent(new KeyboardEvent('keyup', {'key': "Enter"}))
+            return
+        }
+        if( keyVal == delKey["Backspace"] ){
+            document.body.dispatchEvent(new KeyboardEvent('keyup', {'key': "Backspace"}))
+            return
+        }
+        document.body.dispatchEvent(new KeyboardEvent('keyup', {'key': keyVal}))
+        return
+    }
+
     let keyboardModule = document.querySelector(".keyboardModule") as HTMLDivElement
     for( let row in keySet ){
         let newRowElem = document.createElement("div")
@@ -260,7 +360,9 @@ function setupKeyboardModule(){
             newKeyElem.id = `keyboardKey_${key}`
             newKeyElem.textContent = key.toUpperCase()
             newKeyElem.style.backgroundColor = LetterColour["GREY"]
-            if( ["enter","del"].indexOf(key) != -1 ){
+            newKeyElem.dataset.state = LetterState["INITIAL"]
+            newKeyElem.onclick = (e)=>_onclick(e)
+            if( [enterKey, delKey].includes(key) ){
                 newKeyElem.style.fontSize = "16px"
                 newKeyElem.id = `${key}Key`
             }

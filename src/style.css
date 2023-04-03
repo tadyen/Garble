@@ -39,7 +39,6 @@ main{
     display: flex;
     justify-content: center;
     align-items: center;
-    animation-iteration-count: 1;
 }
 
 .keyboardModule{
@@ -186,3 +185,4 @@ button:hover{
     88% { transform: translateX(1%) }
     100% { transform: translateX(0%) }
 }
+
